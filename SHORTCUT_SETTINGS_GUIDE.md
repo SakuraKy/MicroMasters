@@ -3,10 +3,12 @@
 ## ✅ 已完成的工作
 
 1. **创建了快捷键设置模型** (`ShortcutSettings.swift`)
+
    - 位置：`MicroMasters/Domain/Models/ShortcutSettings.swift`
    - 包含快捷键配置、验证逻辑和管理器
 
 2. **创建了设置窗口** (`ShortcutSettingsWindow.swift`)
+
    - 位置：`MicroMasters/UI/Settings/ShortcutSettingsWindow.swift`
    - 提供图形化界面来自定义快捷键
 
@@ -36,6 +38,7 @@ open MicroMasters.xcodeproj
 ### 步骤 3：添加 ShortcutSettingsWindow.swift
 
 1. 创建 UI/Settings 文件夹（如果不存在）
+
    - 右键点击 `MicroMasters/UI` 文件夹
    - 选择"New Group"
    - 命名为"Settings"
@@ -90,6 +93,7 @@ open MicroMasters.xcodeproj
 完成上述步骤后，你的应用就有了完整的快捷键自定义功能！
 
 如果遇到编译错误，请检查：
+
 1. 文件是否正确添加到项目 target
 2. 文件路径是否正确
 3. 是否有语法错误

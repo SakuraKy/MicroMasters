@@ -52,12 +52,36 @@ final class NotificationManager: NSObject {
         let prompt: Word
         let options: [Word]
     }
+    
+    /// 测试会话 - 保存多个测试题
+    private struct QuizSession {
+        var quizzes: [(Word, [Word])]  // (正确答案, 选项列表)
+        var index: Int = 0
+        
+        var currentQuiz: (Word, [Word])? {
+            guard index >= 0 && index < quizzes.count else { return nil }
+            return quizzes[index]
+        }
+        
+        mutating func advance() {
+            index += 1
+        }
+        
+        var isCompleted: Bool {
+            index >= quizzes.count
+        }
+        
+        var progress: String {
+            return "\(index + 1)/\(quizzes.count)"
+        }
+    }
 
     private let center = UNUserNotificationCenter.current()
     private let speechSynthesizer = NSSpeechSynthesizer()
     private let studyManager: StudyManager
     private var studySession: StudySession?
     private var quizState: QuizState?
+    private var quizSession: QuizSession?  // 新增：测试会话
     private var staticCategories: Set<UNNotificationCategory> = []
 
     init(studyManager: StudyManager) {
@@ -131,10 +155,15 @@ final class NotificationManager: NSObject {
             quizzes.append((word, Array(options)))
         }
         
-        // 使用第一题开始
+        NSLog("📖 生成了 \(quizzes.count) 道测试题")
+        
+        // 创建测试会话
+        quizSession = QuizSession(quizzes: quizzes, index: 0)
+        studySession = nil
+        
+        // 开始第一题
         if let firstQuiz = quizzes.first {
             quizState = QuizState(prompt: firstQuiz.0, options: firstQuiz.1)
-            studySession = nil
             scheduleQuizNotification()
         }
     }
@@ -188,7 +217,15 @@ final class NotificationManager: NSObject {
         registerQuizCategory(options: quizState.options)
 
         let content = UNMutableNotificationContent()
-        content.title = "随机测试"
+        
+        // 如果是测试会话,显示进度
+        if let session = quizSession {
+            content.title = "随机测试 [\(session.progress)]"
+            NSLog("📝 显示测试题 \(session.progress)")
+        } else {
+            content.title = "随机测试"
+        }
+        
         content.subtitle = quizState.prompt.meaning
         content.body = "请选择正确的英文释义。"
         content.categoryIdentifier = CategoryID.quiz
@@ -354,6 +391,24 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
 
         scheduleFeedbackNotification(correct: correct, answer: answer)
         self.quizState = nil
+        
+        // 如果是测试会话,继续下一题
+        if var session = quizSession {
+            session.advance()
+            quizSession = session
+            
+            if session.isCompleted {
+                NSLog("✅ 随机测试完成! 共完成 \(session.quizzes.count) 道题")
+                quizSession = nil
+            } else if let nextQuiz = session.currentQuiz {
+                NSLog("➡️ 继续下一题 (\(session.progress))")
+                // 延迟2秒显示下一题,给用户时间看反馈
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                    self?.quizState = QuizState(prompt: nextQuiz.0, options: nextQuiz.1)
+                    self?.scheduleQuizNotification()
+                }
+            }
+        }
     }
 }
 
