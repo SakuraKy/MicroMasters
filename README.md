@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="MicroMasters/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" width="200" alt="MicroMasters Icon"/>
+<img src="assets/app-icon.png" width="200" alt="MicroMasters Icon"/>
 
 # MicroMasters
 
