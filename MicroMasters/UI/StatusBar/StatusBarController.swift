@@ -11,9 +11,20 @@ final class StatusBarController: NSObject {
     private let statusItem: NSStatusItem
     private let studyManager: StudyManager
     private let notificationManager: NotificationManager
+    private let shortcutManager = ShortcutManager.shared
+    
+    // 菜单项引用，用于动态更新快捷键
+    private var startItem: NSMenuItem?
+    private var configItem: NSMenuItem?
+    private var selectDeckItem: NSMenuItem?
+    private var importItem: NSMenuItem?
+    private var exportItem: NSMenuItem?
+    private var quizStartItem: NSMenuItem?
+    private var helpItem: NSMenuItem?
     
     // MARK: - System Appearance Tracking
     private var appearanceObserver: NSObjectProtocol?
+    private var shortcutObserver: NSObjectProtocol?
     
     init(statusItem: NSStatusItem, studyManager: StudyManager, notificationManager: NotificationManager) {
         self.statusItem = statusItem
@@ -22,11 +33,27 @@ final class StatusBarController: NSObject {
         super.init()
         configureStatusItem()
         setupAppearanceObserver()
+        setupShortcutObserver()
     }
     
     deinit {
         if let observer = appearanceObserver {
             NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = shortcutObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
+    
+    /// 监听快捷键设置变化
+    private func setupShortcutObserver() {
+        shortcutObserver = NotificationCenter.default.addObserver(
+            forName: .shortcutSettingsChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            NSLog("⌨️ 快捷键设置已变更，重新构建菜单")
+            self?.configureStatusItem()
         }
     }
     
@@ -113,63 +140,65 @@ final class StatusBarController: NSObject {
         menu.autoenablesItems = true
         menu.allowsContextMenuPlugIns = true
         
+        let shortcuts = shortcutManager.current
+        
         // 根据 macOS 版本使用适当的 SF Symbols（仅 macOS 11+）
-        let startItem = NSMenuItem(title: "开始学习",
+        startItem = NSMenuItem(title: "开始学习",
                                    action: #selector(handleStartStudy),
-                                   keyEquivalent: "s")
-        startItem.target = self
+                                   keyEquivalent: shortcuts.startStudy)
+        startItem?.target = self
         
         // macOS 11+ 支持 SF Symbols
         if #available(macOS 11.0, *) {
-            startItem.image = NSImage(systemSymbolName: "play.circle.fill", accessibilityDescription: "开始")
+            startItem?.image = NSImage(systemSymbolName: "play.circle.fill", accessibilityDescription: "开始")
         }
-        menu.addItem(startItem)
+        menu.addItem(startItem!)
         
-        let configItem = NSMenuItem(title: "设置单词个数…",
+        configItem = NSMenuItem(title: "设置单词个数…",
                                     action: #selector(handleConfigureWordCount),
-                                    keyEquivalent: ",")
-        configItem.target = self
+                                    keyEquivalent: shortcuts.setWordCount)
+        configItem?.target = self
         
         if #available(macOS 11.0, *) {
-            configItem.image = NSImage(systemSymbolName: "slider.horizontal.3", accessibilityDescription: "设置")
+            configItem?.image = NSImage(systemSymbolName: "slider.horizontal.3", accessibilityDescription: "设置")
         }
-        menu.addItem(configItem)
+        menu.addItem(configItem!)
         
         // 添加选择词库菜单项
-        let selectDeckItem = NSMenuItem(title: "选择词库…",
+        selectDeckItem = NSMenuItem(title: "选择词库…",
                                         action: #selector(handleSelectDeck),
-                                        keyEquivalent: "l")
-        selectDeckItem.target = self
+                                        keyEquivalent: shortcuts.selectDeck)
+        selectDeckItem?.target = self
         
         if #available(macOS 11.0, *) {
-            selectDeckItem.image = NSImage(systemSymbolName: "books.vertical.fill", accessibilityDescription: "词库")
+            selectDeckItem?.image = NSImage(systemSymbolName: "books.vertical.fill", accessibilityDescription: "词库")
         }
-        menu.addItem(selectDeckItem)
+        menu.addItem(selectDeckItem!)
 
         menu.addItem(NSMenuItem.separator())
 
         // 英语词汇子菜单
         let vocabularyMenu = NSMenu(title: "英语词汇")
         
-        let importItem = NSMenuItem(title: "导入词库…",
+        importItem = NSMenuItem(title: "导入词库…",
                                     action: #selector(handleImportDeck),
-                                    keyEquivalent: "i")
-        importItem.target = self
+                                    keyEquivalent: shortcuts.importDeck)
+        importItem?.target = self
         
         if #available(macOS 11.0, *) {
-            importItem.image = NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: "导入")
+            importItem?.image = NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: "导入")
         }
-        vocabularyMenu.addItem(importItem)
+        vocabularyMenu.addItem(importItem!)
         
-        let exportItem = NSMenuItem(title: "导出学习记录…",
+        exportItem = NSMenuItem(title: "导出学习记录…",
                                     action: #selector(handleExportRecords),
-                                    keyEquivalent: "e")
-        exportItem.target = self
+                                    keyEquivalent: shortcuts.exportRecords)
+        exportItem?.target = self
         
         if #available(macOS 11.0, *) {
-            exportItem.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: "导出")
+            exportItem?.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: "导出")
         }
-        vocabularyMenu.addItem(exportItem)
+        vocabularyMenu.addItem(exportItem!)
         
         let vocabularyItem = NSMenuItem(title: "英语词汇", action: nil, keyEquivalent: "")
         
@@ -182,15 +211,15 @@ final class StatusBarController: NSObject {
         // 随机测试子菜单
         let quizMenu = NSMenu(title: "随机测试")
         
-        let quizStartItem = NSMenuItem(title: "开始随机测试",
+        quizStartItem = NSMenuItem(title: "开始随机测试",
                                        action: #selector(handleStandaloneQuiz),
-                                       keyEquivalent: "t")
-        quizStartItem.target = self
+                                       keyEquivalent: shortcuts.startQuiz)
+        quizStartItem?.target = self
         
         if #available(macOS 11.0, *) {
-            quizStartItem.image = NSImage(systemSymbolName: "questionmark.circle.fill", accessibilityDescription: "测试")
+            quizStartItem?.image = NSImage(systemSymbolName: "questionmark.circle.fill", accessibilityDescription: "测试")
         }
-        quizMenu.addItem(quizStartItem)
+        quizMenu.addItem(quizStartItem!)
         
         let quizItem = NSMenuItem(title: "随机测试", action: nil, keyEquivalent: "")
         
@@ -202,15 +231,26 @@ final class StatusBarController: NSObject {
 
         menu.addItem(NSMenuItem.separator())
 
-        let helpItem = NSMenuItem(title: "使用说明",
+        helpItem = NSMenuItem(title: "使用说明",
                                   action: #selector(handleShowHelp),
-                                  keyEquivalent: "?")
-        helpItem.target = self
+                                  keyEquivalent: shortcuts.showHelp)
+        helpItem?.target = self
         
         if #available(macOS 11.0, *) {
-            helpItem.image = NSImage(systemSymbolName: "questionmark.circle", accessibilityDescription: "帮助")
+            helpItem?.image = NSImage(systemSymbolName: "questionmark.circle", accessibilityDescription: "帮助")
         }
-        menu.addItem(helpItem)
+        menu.addItem(helpItem!)
+        
+        // 添加快捷键设置菜单项
+        let shortcutSettingsItem = NSMenuItem(title: "快捷键设置…",
+                                              action: #selector(handleShortcutSettings),
+                                              keyEquivalent: "")
+        shortcutSettingsItem.target = self
+        
+        if #available(macOS 11.0, *) {
+            shortcutSettingsItem.image = NSImage(systemSymbolName: "keyboard", accessibilityDescription: "快捷键")
+        }
+        menu.addItem(shortcutSettingsItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -471,6 +511,13 @@ final class StatusBarController: NSObject {
         )
         alert.addButton(withTitle: "好的")
         alert.runModal()
+    }
+    
+    @objc private func handleShortcutSettings() {
+        NSLog("⌨️ 打开快捷键设置窗口")
+        let settingsWindow = ShortcutSettingsWindow()
+        settingsWindow.showWindow(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc private func handleQuit() {
