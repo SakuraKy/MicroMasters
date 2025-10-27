@@ -20,15 +20,34 @@ MicroMasters 是一个基于 AppKit 的 macOS 菜单栏背单词应用，支持�
 - Xcode 14.0 或更高版本
 - Swift 5
 
-### 构建步骤
+### 安装使用
+
+从 [Releases](https://github.com/SakuraKy/MicroMasters/releases) 页面下载最新版本的 DMG 文件，双击安装即可。
+
+#### macOS 安装可能遇到的问题
+
+你在 macOS 上安装时可能会遇到 "MicroMasters.app" 已损坏，无法打开。你应该将它移到废纸篓。的问题，一般情况下这并非文件损坏。事实上，如果要完全避免这个问题，我们需要每年向苹果支付 99 美元以生成可信任的证书。我们并没有能力支付这些金额。如果你要使用此软件，可能需要一些额外的操作去完成这件事情。
+
+1. 下载并拖动到 Application 目录。
+2. 打开你的终端，然后运行。
+
+```bash
+xattr -d com.apple.quarantine /Applications/MicroMasters.app
+```
+
+3. 打开应用程序并开始使用。
+
+### 从源码构建
 
 1. 克隆项目到本地：
+
 ```bash
-git clone https://github.com/yourusername/MicroMasters.git
+git clone https://github.com/SakuraKy/MicroMasters.git
 cd MicroMasters
 ```
 
 2. 打开 Xcode 项目：
+
 ```bash
 open MicroMasters.xcodeproj
 ```
@@ -53,6 +72,7 @@ open MicroMasters.xcodeproj
 ### 词库格式
 
 CSV 文件格式（UTF-8 编码）：
+
 ```csv
 term,phonetic,pos,meaning,example
 abandon,/əˈbændən/,v.,放弃；抛弃,They had to abandon the car.
@@ -61,6 +81,7 @@ abandon,/əˈbændən/,v.,放弃；抛弃,They had to abandon the car.
 ### 数据存储
 
 所有数据存储在：`~/Library/Application Support/MicroMasters/`
+
 - `ReviewRecord.json` - 学习记录
 - `default_words.csv` - 默认词库
 - 其他导入的词库文件
@@ -74,6 +95,7 @@ abandon,/əˈbændən/,v.,放弃；抛弃,They had to abandon the car.
 - **rebuild.sh** - 快速清理并重新构建应用
 
 使用方法：
+
 ```bash
 cd Scripts
 ./build.sh     # 构建完整的 Release 版本并打包 DMG
