@@ -1,6 +1,6 @@
 # MicroMasters
 
-[简体中文](README_zh-CN.md) | [English](README_en.md)
+简体中文 | [English](README_en.md)
 
 MicroMasters 是一个基于 AppKit 的 macOS 菜单栏背单词应用，支持词库导入、学习通知与随机测验。
 
