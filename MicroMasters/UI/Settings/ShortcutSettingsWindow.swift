@@ -26,7 +26,7 @@ final class ShortcutSettingsWindow: NSWindowController {
         self.settings = shortcutManager.current
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 480),
+            contentRect: NSRect(x: 0, y: 0, width: 500, height: 420),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
@@ -36,6 +36,7 @@ final class ShortcutSettingsWindow: NSWindowController {
         
         super.init(window: window)
         
+        NSLog("⌨️ ShortcutSettingsWindow 初始化，当前设置: \(settings)")
         setupUI()
     }
     
@@ -44,91 +45,122 @@ final class ShortcutSettingsWindow: NSWindowController {
     }
     
     private func setupUI() {
-        guard let contentView = window?.contentView else { return }
+        guard let contentView = window?.contentView else { 
+            NSLog("❌ 无法获取 contentView")
+            return 
+        }
         
-        let stackView = NSStackView()
-        stackView.orientation = .vertical
-        stackView.alignment = .leading
-        stackView.spacing = 16
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(stackView)
+        // 主容器
+        let mainStack = NSStackView()
+        mainStack.orientation = .vertical
+        mainStack.alignment = .leading
+        mainStack.spacing = 20
+        mainStack.edgeInsets = NSEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(mainStack)
         
         // 标题
         let titleLabel = NSTextField(labelWithString: "自定义快捷键")
         titleLabel.font = NSFont.systemFont(ofSize: 16, weight: .semibold)
-        stackView.addArrangedSubview(titleLabel)
+        titleLabel.textColor = .labelColor
+        mainStack.addArrangedSubview(titleLabel)
         
         // 说明
         let descLabel = NSTextField(labelWithString: "请输入单个字符作为快捷键（按 Cmd + Ctrl + 字符触发）")
         descLabel.font = NSFont.systemFont(ofSize: 11)
         descLabel.textColor = .secondaryLabelColor
-        stackView.addArrangedSubview(descLabel)
+        mainStack.addArrangedSubview(descLabel)
         
         // 分隔线
-        let separator1 = NSBox()
-        separator1.boxType = .separator
-        separator1.translatesAutoresizingMaskIntoConstraints = false
-        stackView.addArrangedSubview(separator1)
+        let separator1 = createSeparator()
+        mainStack.addArrangedSubview(separator1)
         
         // 快捷键输入项
-        addShortcutRow(to: stackView, label: "开始学习:", field: startStudyField, value: settings.startStudy)
-        addShortcutRow(to: stackView, label: "设置单词个数:", field: setWordCountField, value: settings.setWordCount)
-        addShortcutRow(to: stackView, label: "选择词库:", field: selectDeckField, value: settings.selectDeck)
-        addShortcutRow(to: stackView, label: "导入词库:", field: importDeckField, value: settings.importDeck)
-        addShortcutRow(to: stackView, label: "导出学习记录:", field: exportRecordsField, value: settings.exportRecords)
-        addShortcutRow(to: stackView, label: "开始随机测试:", field: startQuizField, value: settings.startQuiz)
-        addShortcutRow(to: stackView, label: "使用说明:", field: showHelpField, value: settings.showHelp)
+        let fieldsStack = NSStackView()
+        fieldsStack.orientation = .vertical
+        fieldsStack.alignment = .leading
+        fieldsStack.spacing = 12
+        
+        fieldsStack.addArrangedSubview(createShortcutRow(label: "开始学习:", field: startStudyField, value: settings.startStudy))
+        fieldsStack.addArrangedSubview(createShortcutRow(label: "设置单词个数:", field: setWordCountField, value: settings.setWordCount))
+        fieldsStack.addArrangedSubview(createShortcutRow(label: "选择词库:", field: selectDeckField, value: settings.selectDeck))
+        fieldsStack.addArrangedSubview(createShortcutRow(label: "导入词库:", field: importDeckField, value: settings.importDeck))
+        fieldsStack.addArrangedSubview(createShortcutRow(label: "导出学习记录:", field: exportRecordsField, value: settings.exportRecords))
+        fieldsStack.addArrangedSubview(createShortcutRow(label: "开始随机测试:", field: startQuizField, value: settings.startQuiz))
+        fieldsStack.addArrangedSubview(createShortcutRow(label: "使用说明:", field: showHelpField, value: settings.showHelp))
+        
+        mainStack.addArrangedSubview(fieldsStack)
         
         // 分隔线
-        let separator2 = NSBox()
-        separator2.boxType = .separator
-        separator2.translatesAutoresizingMaskIntoConstraints = false
-        stackView.addArrangedSubview(separator2)
+        let separator2 = createSeparator()
+        mainStack.addArrangedSubview(separator2)
         
         // 按钮栏
         let buttonStack = NSStackView()
         buttonStack.orientation = .horizontal
         buttonStack.spacing = 12
+        buttonStack.distribution = .gravityAreas
         
         let resetButton = NSButton(title: "恢复默认", target: self, action: #selector(resetToDefaults))
         resetButton.bezelStyle = .rounded
+        resetButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        let spacer = NSView()
+        spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         
         let cancelButton = NSButton(title: "取消", target: self, action: #selector(cancel))
         cancelButton.bezelStyle = .rounded
         cancelButton.keyEquivalent = "\u{1b}" // ESC
+        cancelButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
         let saveButton = NSButton(title: "保存", target: self, action: #selector(save))
         saveButton.bezelStyle = .rounded
         saveButton.keyEquivalent = "\r" // Enter
+        saveButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
         buttonStack.addArrangedSubview(resetButton)
-        buttonStack.addArrangedSubview(NSView()) // Spacer
+        buttonStack.addArrangedSubview(spacer)
         buttonStack.addArrangedSubview(cancelButton)
         buttonStack.addArrangedSubview(saveButton)
         
-        stackView.addArrangedSubview(buttonStack)
+        mainStack.addArrangedSubview(buttonStack)
         
         // 约束
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            separator1.widthAnchor.constraint(equalTo: stackView.widthAnchor),
-            separator2.widthAnchor.constraint(equalTo: stackView.widthAnchor),
-            buttonStack.widthAnchor.constraint(equalTo: stackView.widthAnchor)
+            separator1.widthAnchor.constraint(equalTo: mainStack.widthAnchor, constant: -40),
+            separator2.widthAnchor.constraint(equalTo: mainStack.widthAnchor, constant: -40),
+            buttonStack.widthAnchor.constraint(equalTo: mainStack.widthAnchor, constant: -40),
+            fieldsStack.widthAnchor.constraint(equalTo: mainStack.widthAnchor, constant: -40)
         ])
+        
+        NSLog("✅ ShortcutSettingsWindow UI 设置完成")
     }
     
-    private func addShortcutRow(to stackView: NSStackView, label: String, field: NSTextField, value: String) {
+    private func createSeparator() -> NSBox {
+        let separator = NSBox()
+        separator.boxType = .separator
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        return separator
+    }
+    
+    private func createShortcutRow(label: String, field: NSTextField, value: String) -> NSView {
         let rowStack = NSStackView()
         rowStack.orientation = .horizontal
         rowStack.spacing = 12
         rowStack.alignment = .centerY
+        rowStack.distribution = .gravityAreas
         
         let labelView = NSTextField(labelWithString: label)
         labelView.alignment = .right
+        labelView.font = .systemFont(ofSize: 13)
+        labelView.textColor = .labelColor
         labelView.setContentHuggingPriority(.required, for: .horizontal)
+        labelView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             labelView.widthAnchor.constraint(equalToConstant: 140)
         ])
@@ -136,6 +168,8 @@ final class ShortcutSettingsWindow: NSWindowController {
         field.stringValue = value
         field.placeholderString = "单个字符"
         field.maximumNumberOfLines = 1
+        field.font = .systemFont(ofSize: 13)
+        field.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             field.widthAnchor.constraint(equalToConstant: 60)
         ])
@@ -143,20 +177,23 @@ final class ShortcutSettingsWindow: NSWindowController {
         let hintLabel = NSTextField(labelWithString: "Cmd + Ctrl + \(value)")
         hintLabel.font = NSFont.systemFont(ofSize: 10)
         hintLabel.textColor = .tertiaryLabelColor
+        hintLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         
         rowStack.addArrangedSubview(labelView)
         rowStack.addArrangedSubview(field)
         rowStack.addArrangedSubview(hintLabel)
-        rowStack.addArrangedSubview(NSView()) // Spacer
         
-        stackView.addArrangedSubview(rowStack)
-        
+        rowStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            rowStack.widthAnchor.constraint(equalTo: stackView.widthAnchor)
+            rowStack.heightAnchor.constraint(equalToConstant: 24)
         ])
+        
+        return rowStack
     }
     
     @objc private func resetToDefaults() {
+        NSLog("🔄 点击了恢复默认按钮")
+        
         let alert = NSAlert()
         alert.messageText = "恢复默认快捷键"
         alert.informativeText = "确定要恢复所有快捷键为默认设置吗？"
@@ -164,7 +201,10 @@ final class ShortcutSettingsWindow: NSWindowController {
         alert.addButton(withTitle: "恢复")
         alert.addButton(withTitle: "取消")
         
-        guard alert.runModal() == .alertFirstButtonReturn else {
+        let response = alert.runModal()
+        NSLog("🔄 用户选择: \(response == .alertFirstButtonReturn ? "恢复" : "取消")")
+        
+        guard response == .alertFirstButtonReturn else {
             return
         }
         
@@ -182,15 +222,16 @@ final class ShortcutSettingsWindow: NSWindowController {
         showHelpField.stringValue = settings.showHelp
         
         NSLog("✅ 快捷键已重置，窗口即将关闭")
-        window?.close()
+        close()
     }
     
     @objc private func cancel() {
-        window?.close()
+        NSLog("❌ 点击了取消按钮")
+        close()
     }
     
     @objc private func save() {
-        NSLog("💾 保存按钮被点击")
+        NSLog("💾 点击了保存按钮")
         
         // 读取输入的快捷键
         let newSettings = ShortcutSettings(
@@ -203,20 +244,30 @@ final class ShortcutSettingsWindow: NSWindowController {
             showHelp: showHelpField.stringValue.trimmingCharacters(in: .whitespaces)
         )
         
-        NSLog("📝 新快捷键设置: startStudy=\(newSettings.startStudy), setWordCount=\(newSettings.setWordCount), selectDeck=\(newSettings.selectDeck), importDeck=\(newSettings.importDeck), exportRecords=\(newSettings.exportRecords), startQuiz=\(newSettings.startQuiz), showHelp=\(newSettings.showHelp)")
+        NSLog("📝 新快捷键设置:")
+        NSLog("  - startStudy: '\(newSettings.startStudy)'")
+        NSLog("  - setWordCount: '\(newSettings.setWordCount)'")
+        NSLog("  - selectDeck: '\(newSettings.selectDeck)'")
+        NSLog("  - importDeck: '\(newSettings.importDeck)'")
+        NSLog("  - exportRecords: '\(newSettings.exportRecords)'")
+        NSLog("  - startQuiz: '\(newSettings.startQuiz)'")
+        NSLog("  - showHelp: '\(newSettings.showHelp)'")
         
         // 验证并保存
         do {
             try shortcutManager.save(newSettings)
-            NSLog("✅ 快捷键保存成功")
+            NSLog("✅ 快捷键保存成功!")
             
-            // 确保窗口关闭
-            if let win = window {
-                NSLog("✅ 关闭设置窗口")
-                win.close()
-            } else {
-                NSLog("⚠️ window 为 nil，无法关闭")
-            }
+            // 显示成功提示
+            let successAlert = NSAlert()
+            successAlert.messageText = "保存成功"
+            successAlert.informativeText = "快捷键设置已更新，菜单栏快捷键将立即生效。"
+            successAlert.alertStyle = .informational
+            successAlert.addButton(withTitle: "确定")
+            successAlert.runModal()
+            
+            NSLog("✅ 关闭设置窗口")
+            close()
         } catch {
             NSLog("❌ 保存快捷键失败: \(error.localizedDescription)")
             let alert = NSAlert()

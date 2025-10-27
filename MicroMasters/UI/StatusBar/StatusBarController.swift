@@ -22,6 +22,9 @@ final class StatusBarController: NSObject {
     private var quizStartItem: NSMenuItem?
     private var helpItem: NSMenuItem?
     
+    // 保持设置窗口的强引用，防止被释放
+    private var shortcutSettingsWindow: ShortcutSettingsWindow?
+    
     // MARK: - System Appearance Tracking
     private var appearanceObserver: NSObjectProtocol?
     private var shortcutObserver: NSObjectProtocol?
@@ -523,7 +526,28 @@ final class StatusBarController: NSObject {
     
     @objc private func handleShortcutSettings() {
         NSLog("⌨️ 打开快捷键设置窗口")
+        
+        // 如果窗口已存在，直接显示
+        if let existingWindow = shortcutSettingsWindow {
+            existingWindow.showWindow(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        
+        // 创建新窗口并保持强引用
         let settingsWindow = ShortcutSettingsWindow()
+        self.shortcutSettingsWindow = settingsWindow
+        
+        // 监听窗口关闭事件，释放引用
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: settingsWindow.window,
+            queue: .main
+        ) { [weak self] _ in
+            NSLog("⌨️ 快捷键设置窗口已关闭，释放引用")
+            self?.shortcutSettingsWindow = nil
+        }
+        
         settingsWindow.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
