@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A95982F557BB4425999A6D8E /* XLSXWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AE1723E7C04BDAAF112646 /* XLSXWriter.swift */; };
+		6AA1C2162EAF73CA0008F5DE /* ShortcutSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AA1C2152EAF73CA0008F5DE /* ShortcutSettings.swift */; };
+		6AA1C2192EAF74380008F5DE /* ShortcutSettingsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AA1C2182EAF74380008F5DE /* ShortcutSettingsWindow.swift */; };
 		A0000000000000000000001A /* App/AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000005 /* App/AppDelegate.swift */; };
-		A00000000000000000000025 /* App/main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000024 /* App/main.swift */; };
-		A0000000000000000000001B /* UI/StatusBar/StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000006 /* UI/StatusBar/StatusBarController.swift */; };
+		A0000000000000000000001B /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000006 /* StatusBarController.swift */; };
 		A0000000000000000000001C /* Domain/Models/Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000007 /* Domain/Models/Models.swift */; };
 		A0000000000000000000001D /* Services/StudyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000008 /* Services/StudyManager.swift */; };
 		A0000000000000000000001E /* Services/NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000009 /* Services/NotificationManager.swift */; };
@@ -18,13 +18,17 @@
 		A00000000000000000000020 /* Resources/default_words.csv in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000B /* Resources/default_words.csv */; };
 		A00000000000000000000021 /* Resources/Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000C /* Resources/Assets.xcassets */; };
 		A00000000000000000000022 /* Support/BuildPhases.md in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000E /* Support/BuildPhases.md */; };
+		A00000000000000000000025 /* App/main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000024 /* App/main.swift */; };
+		A95982F557BB4425999A6D8E /* XLSXWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AE1723E7C04BDAAF112646 /* XLSXWriter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6AA1C2152EAF73CA0008F5DE /* ShortcutSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain/Models/ShortcutSettings.swift; sourceTree = "<group>"; };
+		6AA1C2182EAF74380008F5DE /* ShortcutSettingsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/Settings/ShortcutSettingsWindow.swift; sourceTree = "<group>"; };
 		91AE1723E7C04BDAAF112646 /* XLSXWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = XLSXWriter.swift; path = MicroMasters/Services/XLSXWriter.swift; sourceTree = "<group>"; };
 		A00000000000000000000004 /* MicroMasters.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MicroMasters.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A00000000000000000000005 /* App/AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/AppDelegate.swift; sourceTree = "<group>"; usesTabs = 0; };
-		A00000000000000000000006 /* UI/StatusBar/StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI/StatusBar/StatusBarController.swift; sourceTree = "<group>"; };
+		A00000000000000000000006 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatusBarController.swift; path = ../UI/StatusBar/StatusBarController.swift; sourceTree = "<group>"; };
 		A00000000000000000000007 /* Domain/Models/Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain/Models/Models.swift; sourceTree = "<group>"; };
 		A00000000000000000000008 /* Services/StudyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/StudyManager.swift; sourceTree = "<group>"; };
 		A00000000000000000000009 /* Services/NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/NotificationManager.swift; sourceTree = "<group>"; };
@@ -48,11 +52,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6AA1C2142EAF73580008F5DE /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				91AE1723E7C04BDAAF112646 /* XLSXWriter.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		6AA1C2172EAF73F80008F5DE /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				6AA1C2182EAF74380008F5DE /* ShortcutSettingsWindow.swift */,
+			);
+			sourceTree = "<group>";
+		};
+		6AA1C21B2EAF74A40008F5DE /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000006 /* StatusBarController.swift */,
+			);
+			path = "New Group";
+			sourceTree = "<group>";
+		};
 		A00000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000003 /* MicroMasters */,
 				A00000000000000000000002 /* Products */,
+				6AA1C2142EAF73580008F5DE /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,10 +99,12 @@
 				A00000000000000000000024 /* App/main.swift */,
 				A0000000000000000000000D /* App/Info.plist */,
 				A00000000000000000000007 /* Domain/Models/Models.swift */,
+				6AA1C2152EAF73CA0008F5DE /* ShortcutSettings.swift */,
 				A00000000000000000000008 /* Services/StudyManager.swift */,
 				A00000000000000000000009 /* Services/NotificationManager.swift */,
 				A0000000000000000000000A /* Services/ExcelIO.swift */,
-				A00000000000000000000006 /* UI/StatusBar/StatusBarController.swift */,
+				6AA1C21B2EAF74A40008F5DE /* New Group */,
+				6AA1C2172EAF73F80008F5DE /* Settings */,
 				A0000000000000000000000C /* Resources/Assets.xcassets */,
 				A0000000000000000000000B /* Resources/default_words.csv */,
 				A0000000000000000000000F /* Support/MicroMasters.entitlements */,
@@ -157,7 +187,9 @@
 			files = (
 				A95982F557BB4425999A6D8E /* XLSXWriter.swift in Sources */,
 				A0000000000000000000001A /* App/AppDelegate.swift in Sources */,
-				A0000000000000000000001B /* UI/StatusBar/StatusBarController.swift in Sources */,
+				6AA1C2162EAF73CA0008F5DE /* ShortcutSettings.swift in Sources */,
+				A0000000000000000000001B /* StatusBarController.swift in Sources */,
+				6AA1C2192EAF74380008F5DE /* ShortcutSettingsWindow.swift in Sources */,
 				A0000000000000000000001C /* Domain/Models/Models.swift in Sources */,
 				A0000000000000000000001D /* Services/StudyManager.swift in Sources */,
 				A0000000000000000000001E /* Services/NotificationManager.swift in Sources */,

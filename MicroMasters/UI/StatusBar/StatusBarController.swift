@@ -147,6 +147,7 @@ final class StatusBarController: NSObject {
                                    action: #selector(handleStartStudy),
                                    keyEquivalent: shortcuts.startStudy)
         startItem?.target = self
+        startItem?.keyEquivalentModifierMask = [.command, .control]
         
         // macOS 11+ 支持 SF Symbols
         if #available(macOS 11.0, *) {
@@ -158,6 +159,7 @@ final class StatusBarController: NSObject {
                                     action: #selector(handleConfigureWordCount),
                                     keyEquivalent: shortcuts.setWordCount)
         configItem?.target = self
+        configItem?.keyEquivalentModifierMask = [.command, .control]
         
         if #available(macOS 11.0, *) {
             configItem?.image = NSImage(systemSymbolName: "slider.horizontal.3", accessibilityDescription: "设置")
@@ -169,6 +171,7 @@ final class StatusBarController: NSObject {
                                         action: #selector(handleSelectDeck),
                                         keyEquivalent: shortcuts.selectDeck)
         selectDeckItem?.target = self
+        selectDeckItem?.keyEquivalentModifierMask = [.command, .control]
         
         if #available(macOS 11.0, *) {
             selectDeckItem?.image = NSImage(systemSymbolName: "books.vertical.fill", accessibilityDescription: "词库")
@@ -184,6 +187,7 @@ final class StatusBarController: NSObject {
                                     action: #selector(handleImportDeck),
                                     keyEquivalent: shortcuts.importDeck)
         importItem?.target = self
+        importItem?.keyEquivalentModifierMask = [.command, .control]
         
         if #available(macOS 11.0, *) {
             importItem?.image = NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: "导入")
@@ -194,6 +198,7 @@ final class StatusBarController: NSObject {
                                     action: #selector(handleExportRecords),
                                     keyEquivalent: shortcuts.exportRecords)
         exportItem?.target = self
+        exportItem?.keyEquivalentModifierMask = [.command, .control]
         
         if #available(macOS 11.0, *) {
             exportItem?.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: "导出")
@@ -215,6 +220,7 @@ final class StatusBarController: NSObject {
                                        action: #selector(handleStandaloneQuiz),
                                        keyEquivalent: shortcuts.startQuiz)
         quizStartItem?.target = self
+        quizStartItem?.keyEquivalentModifierMask = [.command, .control]
         
         if #available(macOS 11.0, *) {
             quizStartItem?.image = NSImage(systemSymbolName: "questionmark.circle.fill", accessibilityDescription: "测试")
@@ -235,6 +241,7 @@ final class StatusBarController: NSObject {
                                   action: #selector(handleShowHelp),
                                   keyEquivalent: shortcuts.showHelp)
         helpItem?.target = self
+        helpItem?.keyEquivalentModifierMask = [.command, .control]
         
         if #available(macOS 11.0, *) {
             helpItem?.image = NSImage(systemSymbolName: "questionmark.circle", accessibilityDescription: "帮助")
@@ -503,10 +510,11 @@ final class StatusBarController: NSObject {
             • 检验学习效果
             
             ⌨️ 快捷键：
-            • ⌘S - 开始学习
-            • ⌘, - 设置
-            • ⌘L - 选择词库
-            • ⌘T - 随机测试
+            • ⌘⌃S - 开始学习
+            • ⌘⌃, - 设置
+            • ⌘⌃L - 选择词库
+            • ⌘⌃T - 随机测试
+            • 可在"快捷键设置"中自定义
             """
         )
         alert.addButton(withTitle: "好的")

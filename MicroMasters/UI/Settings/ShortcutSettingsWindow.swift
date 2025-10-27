@@ -59,7 +59,7 @@ final class ShortcutSettingsWindow: NSWindowController {
         stackView.addArrangedSubview(titleLabel)
         
         // 说明
-        let descLabel = NSTextField(labelWithString: "请输入单个字符作为快捷键（按 Cmd + 字符触发）")
+        let descLabel = NSTextField(labelWithString: "请输入单个字符作为快捷键（按 Cmd + Ctrl + 字符触发）")
         descLabel.font = NSFont.systemFont(ofSize: 11)
         descLabel.textColor = .secondaryLabelColor
         stackView.addArrangedSubview(descLabel)
@@ -140,7 +140,7 @@ final class ShortcutSettingsWindow: NSWindowController {
             field.widthAnchor.constraint(equalToConstant: 60)
         ])
         
-        let hintLabel = NSTextField(labelWithString: "Cmd + \(value)")
+        let hintLabel = NSTextField(labelWithString: "Cmd + Ctrl + \(value)")
         hintLabel.font = NSFont.systemFont(ofSize: 10)
         hintLabel.textColor = .tertiaryLabelColor
         
@@ -164,10 +164,11 @@ final class ShortcutSettingsWindow: NSWindowController {
         alert.addButton(withTitle: "恢复")
         alert.addButton(withTitle: "取消")
         
-        guard let window = window, alert.runModal() == .alertFirstButtonReturn else {
+        guard alert.runModal() == .alertFirstButtonReturn else {
             return
         }
         
+        NSLog("🔄 重置快捷键为默认值")
         shortcutManager.reset()
         self.settings = shortcutManager.current
         
@@ -180,7 +181,8 @@ final class ShortcutSettingsWindow: NSWindowController {
         startQuizField.stringValue = settings.startQuiz
         showHelpField.stringValue = settings.showHelp
         
-        window.close()
+        NSLog("✅ 快捷键已重置，窗口即将关闭")
+        window?.close()
     }
     
     @objc private func cancel() {
@@ -188,6 +190,8 @@ final class ShortcutSettingsWindow: NSWindowController {
     }
     
     @objc private func save() {
+        NSLog("💾 保存按钮被点击")
+        
         // 读取输入的快捷键
         let newSettings = ShortcutSettings(
             startStudy: startStudyField.stringValue.trimmingCharacters(in: .whitespaces),
@@ -199,11 +203,22 @@ final class ShortcutSettingsWindow: NSWindowController {
             showHelp: showHelpField.stringValue.trimmingCharacters(in: .whitespaces)
         )
         
+        NSLog("📝 新快捷键设置: startStudy=\(newSettings.startStudy), setWordCount=\(newSettings.setWordCount), selectDeck=\(newSettings.selectDeck), importDeck=\(newSettings.importDeck), exportRecords=\(newSettings.exportRecords), startQuiz=\(newSettings.startQuiz), showHelp=\(newSettings.showHelp)")
+        
         // 验证并保存
         do {
             try shortcutManager.save(newSettings)
-            window?.close()
+            NSLog("✅ 快捷键保存成功")
+            
+            // 确保窗口关闭
+            if let win = window {
+                NSLog("✅ 关闭设置窗口")
+                win.close()
+            } else {
+                NSLog("⚠️ window 为 nil，无法关闭")
+            }
         } catch {
+            NSLog("❌ 保存快捷键失败: \(error.localizedDescription)")
             let alert = NSAlert()
             alert.messageText = "保存失败"
             alert.informativeText = error.localizedDescription
